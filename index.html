@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fradel & Sweets | Dubai Chewy Cookie</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fff4df;
+      --pistachio: #b9d99e;
+      --rose: #ffc7d9;
+      --chocolate: #3b2118;
+      --gold: #e0b65a;
+      --mint: #dff4de;
+      --sky: #e8f5ff;
+      --dark: #180d09;
+      --x: 50%;
+      --y: 50%;
+      --scroll: 0;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--chocolate);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    a, button, .hotspot, .flavour-card, .tilt-card { cursor: none; }
+    .font-display { font-family: 'Playfair Display', serif; }
+
+    .cursor-dot, .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 50%;
+      mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      width: 9px;
+      height: 9px;
+      background: #fff;
+    }
+    .cursor-ring {
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,0.8);
+      transition: width .2s ease, height .2s ease, background .2s ease;
+    }
+    body.cursor-big .cursor-ring {
+      width: 78px;
+      height: 78px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .nav-glass {
+      background: rgba(255, 246, 226, 0.72);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(59, 33, 24, 0.08);
+      box-shadow: 0 18px 50px rgba(59, 33, 24, 0.08);
+    }
+
+    .theme-section {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .theme-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.55), transparent 22%);
+      opacity: .75;
+      z-index: -1;
+      transition: opacity .3s ease;
+    }
+
+    .section-hero { background: radial-gradient(circle at 25% 20%, #ffe3a9 0 18%, transparent 35%), linear-gradient(135deg, #fff0d7, #ffd6e5 45%, #dff4de); }
+    .section-crunch { background: radial-gradient(circle at 80% 20%, #ffdd7a 0 14%, transparent 32%), linear-gradient(135deg, #28160f, #5a2d1d 48%, #b87935); color: #fff7e8; }
+    .section-pistachio { background: radial-gradient(circle at 10% 70%, #ffffff 0 12%, transparent 28%), linear-gradient(135deg, #dff4de, #b9d99e 55%, #f6dc91); }
+    .section-menu { background: radial-gradient(circle at 85% 65%, #ffe5ef 0 16%, transparent 33%), linear-gradient(135deg, #fff8ee, #ffe0ec 50%, #e7f6ff); }
+    .section-order { background: linear-gradient(135deg, #180d09, #3b2118 45%, #7a4528); color: #fff4df; }
+
+    .blob {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(2px);
+      opacity: 0.75;
+      animation: float 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .blob.one { width: 260px; height: 260px; background: #ffc7d9; top: 12%; left: -80px; }
+    .blob.two { width: 190px; height: 190px; background: #f2cf78; bottom: 12%; right: 7%; animation-delay: -2s; }
+    .blob.three { width: 130px; height: 130px; background: #c7dfb5; top: 18%; right: 18%; animation-delay: -4s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-28px) rotate(7deg); }
+    }
+
+    .cookie-stage {
+      position: relative;
+      width: min(560px, 88vw);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+
+    .cookie-wrap {
+      width: 74%;
+      aspect-ratio: 1;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .25s ease;
+    }
+
+    .cookie {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 25% 30%, #7b3f20 0 4%, transparent 5%),
+        radial-gradient(circle at 62% 24%, #7b3f20 0 5%, transparent 6%),
+        radial-gradient(circle at 70% 68%, #7b3f20 0 4%, transparent 5%),
+        radial-gradient(circle at 35% 72%, #7b3f20 0 5%, transparent 6%),
+        radial-gradient(circle at 50% 52%, #2d8d53 0 17%, transparent 18%),
+        radial-gradient(circle at 50% 52%, #f3c457 0 30%, transparent 31%),
+        radial-gradient(circle at 43% 37%, #d89447, #9b5726 65%, #5a2d1d 100%);
+      box-shadow: 0 36px 80px rgba(59, 33, 24, 0.32), inset -20px -25px 40px rgba(51, 20, 9, 0.26), inset 12px 18px 35px rgba(255, 225, 159, 0.35);
+      position: relative;
+      animation: cookiePulse 5.5s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    .cookie::before {
+      content: '';
+      position: absolute;
+      inset: 17%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 40%, rgba(52, 160, 83, 0.96), rgba(17, 95, 50, 0.95));
+      clip-path: polygon(50% 0%, 66% 19%, 92% 21%, 74% 44%, 81% 73%, 51% 59%, 22% 75%, 29% 46%, 8% 22%, 36% 19%);
+      opacity: 0.92;
+    }
+
+    .cookie::after {
+      content: '';
+      position: absolute;
+      width: 48%;
+      height: 17%;
+      background: linear-gradient(90deg, #f2cc6b, #fff1b8, #d79b38);
+      top: 50%;
+      left: 26%;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      transform: rotate(-8deg);
+      opacity: 0.96;
+    }
+
+    @keyframes cookiePulse {
+      0%, 100% { transform: rotate(-3deg) scale(1); }
+      50% { transform: rotate(3deg) scale(1.035); }
+    }
+
+    .ring, .ring2 {
+      position: absolute;
+      border-radius: 50%;
+      animation: spin 22s linear infinite;
+      pointer-events: none;
+    }
+    .ring { inset: 7%; border: 2px dashed rgba(59, 33, 24, 0.23); }
+    .ring2 { inset: 18%; border: 1px solid rgba(59, 33, 24, 0.15); animation-direction: reverse; animation-duration: 15s; }
+    .section-crunch .ring, .section-order .ring { border-color: rgba(255, 244, 223, 0.28); }
+    .section-crunch .ring2, .section-order .ring2 { border-color: rgba(255, 244, 223, 0.18); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .particle {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e0b65a;
+      box-shadow: inset -6px -7px 10px rgba(59,33,24,.18);
+      animation: orbit 12s linear infinite;
+      transform-origin: 180px 180px;
+    }
+    .particle:nth-child(2) { background: #b9d99e; animation-duration: 16s; animation-delay: -4s; }
+    .particle:nth-child(3) { background: #ffc7d9; animation-duration: 20s; animation-delay: -9s; }
+    @keyframes orbit {
+      from { transform: rotate(0deg) translateX(210px) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(210px) rotate(-360deg); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px) scale(0.98);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .theme-card, .tilt-card {
+      border-radius: 32px;
+      background: rgba(255,255,255,0.32);
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 26px 70px rgba(35, 18, 10, 0.12);
+      transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+      transform-style: preserve-3d;
+    }
+    .tilt-card:hover, .flavour-card:hover {
+      box-shadow: 0 34px 95px rgba(35, 18, 10, 0.22);
+    }
+
+    .dark-card {
+      background: rgba(255, 244, 223, 0.1);
+      border: 1px solid rgba(255, 244, 223, 0.2);
+      backdrop-filter: blur(18px);
+    }
+
+    .progress-rail {
+      position: fixed;
+      right: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(59,33,24,0.28);
+      border: 1px solid rgba(255,255,255,0.5);
+      transition: all 0.25s ease;
+    }
+    .dot.active { height: 34px; background: var(--chocolate); }
+
+    .marquee {
+      position: absolute;
+      bottom: 28px;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      opacity: 0.55;
+      font-size: clamp(2rem, 8vw, 7rem);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .marquee span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 24s linear infinite;
+      transform: translateX(calc(var(--scroll) * -0.06px));
+    }
+    @keyframes marquee { to { transform: translateX(-100%); } }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 24px;
+      border-radius: 999px;
+      background: #3b2118;
+      color: #fff4df;
+      font-weight: 900;
+      box-shadow: 0 16px 35px rgba(59, 33, 24, 0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 22px 42px rgba(59, 33, 24, 0.35); }
+    .btn-light { background: #fff4df; color: #3b2118; }
+
+    .ingredient-pill {
+      border: 1px solid rgba(59, 33, 24, 0.15);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.32);
+      font-weight: 800;
+    }
+    .section-crunch .ingredient-pill, .section-order .ingredient-pill {
+      border-color: rgba(255,244,223,0.2);
+      background: rgba(255,244,223,0.1);
+    }
+
+    .split-line { display: block; overflow: hidden; }
+    .split-line span {
+      display: inline-block;
+      transform: translateY(120%);
+      transition: transform 0.8s cubic-bezier(.2,.8,.2,1);
+    }
+    .show .split-line span { transform: translateY(0); }
+
+    .hotspot {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.85);
+      background: rgba(59,33,24,.65);
+      color: #fff4df;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      animation: pingSoft 1.8s ease-in-out infinite;
+      z-index: 5;
+    }
+    .hotspot:nth-of-type(1) { top: 24%; left: 30%; }
+    .hotspot:nth-of-type(2) { top: 48%; right: 21%; animation-delay: -.6s; }
+    .hotspot:nth-of-type(3) { bottom: 21%; left: 38%; animation-delay: -1.2s; }
+    @keyframes pingSoft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.13); }
+    }
+
+    .info-pop {
+      position: absolute;
+      left: 50%;
+      bottom: 4%;
+      transform: translateX(-50%) translateY(15px);
+      width: min(360px, 90vw);
+      background: rgba(255,244,223,.92);
+      color: #3b2118;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      z-index: 6;
+    }
+    .info-pop.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .flavour-card.active {
+      transform: translateY(-12px) scale(1.03) rotate(-1deg);
+      background: rgba(255,255,255,.58);
+    }
+
+    .shake { animation: shake .45s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0) rotate(0); }
+      25% { transform: translateX(-10px) rotate(-3deg); }
+      50% { transform: translateX(10px) rotate(3deg); }
+      75% { transform: translateX(-6px) rotate(-2deg); }
+    }
+
+    .falling-piece {
+      position: fixed;
+      top: -40px;
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: #e0b65a;
+      z-index: 90;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .custom-box {
+      position: relative;
+      border-radius: 38px;
+      background: linear-gradient(135deg, rgba(255,244,223,.78), rgba(255,255,255,.38));
+      border: 2px solid rgba(59,33,24,.16);
+      box-shadow: inset 0 0 0 10px rgba(255,255,255,.18), 0 28px 80px rgba(59,33,24,.16);
+      padding: 24px;
+      min-height: 430px;
+    }
+
+    .box-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      height: 100%;
+    }
+
+    .box-slot {
+      min-height: 165px;
+      border-radius: 30px;
+      border: 2px dashed rgba(59,33,24,.22);
+      background: rgba(255,255,255,.32);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      transition: .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .box-slot.filled {
+      border-style: solid;
+      background: rgba(255,255,255,.62);
+      transform: scale(1.02);
+    }
+
+    .mini-cookie {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      background: radial-gradient(circle at 32% 35%, #7b3f20 0 6%, transparent 7%), radial-gradient(circle at 62% 60%, #7b3f20 0 6%, transparent 7%), radial-gradient(circle at 50% 50%, var(--mini, #2d8d53) 0 23%, transparent 24%), radial-gradient(circle at 45% 42%, #d89447, #8d4c24 72%);
+      box-shadow: 0 12px 25px rgba(59,33,24,.22), inset -8px -10px 18px rgba(51,20,9,.2);
+      animation: cookiePulse 4s ease-in-out infinite;
+    }
+
+    .flavour-option {
+      border-radius: 24px;
+      padding: 16px;
+      background: rgba(255,255,255,.36);
+      border: 1px solid rgba(59,33,24,.12);
+      font-weight: 900;
+      text-align: left;
+      transition: .2s ease;
+    }
+
+    .flavour-option:hover {
+      transform: translateY(-5px) rotate(-1deg);
+      background: rgba(255,255,255,.62);
+      box-shadow: 0 18px 45px rgba(59,33,24,.14);
+    }
+
+    .price-badge {
+      border-radius: 28px;
+      background: #3b2118;
+      color: #fff4df;
+      padding: 18px 22px;
+      box-shadow: 0 20px 50px rgba(59,33,24,.22);
+    }
+
+    .section-custom { background: radial-gradient(circle at 15% 25%, #fff6bd 0 12%, transparent 28%), radial-gradient(circle at 88% 72%, #ffc7d9 0 16%, transparent 34%), linear-gradient(135deg, #e8f5ff, #fff4df 48%, #dff4de); }
+
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      a, button, .hotspot, .flavour-card, .tilt-card { cursor: pointer; }
+      .cursor-dot, .cursor-ring, .progress-rail { display: none; }
+      .theme-section { min-height: auto; padding: 110px 0; }
+      .marquee { bottom: 8px; }
+      .particle { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-6xl nav-glass rounded-full px-4 py-3 flex items-center justify-between">
+    <a href="#home" class="flex items-center gap-3 interactive">
+      <div class="w-10 h-10 rounded-full bg-[#3b2118] grid place-items-center text-[#fff4df] font-black">F</div>
+      <div class="leading-tight">
+        <p class="font-display text-lg font-bold">Fradel & Sweets</p>
+        <p class="text-[11px] uppercase tracking-[0.25em] opacity-70">Dubai Chewy Cookie</p>
+      </div>
+    </a>
+    <div class="hidden md:flex items-center gap-7 text-sm font-bold">
+      <a href="#crunch" class="hover:opacity-60 interactive">Crunch</a>
+      <a href="#science" class="hover:opacity-60 interactive">Inside</a>
+      <a href="#menu" class="hover:opacity-60 interactive">Box</a>
+      <a href="#custom" class="hover:opacity-60 interactive">Customise</a>
+    </div>
+    <a href="https://buy.stripe.com/test_00waEQ6HUgIi3A7g5Wew802" class="btn-primary !py-3 !px-5 text-sm interactive">Order now</a>
+  </nav>
+
+  <div class="progress-rail" aria-hidden="true">
+    <a class="dot active interactive" href="#home"></a>
+    <a class="dot interactive" href="#crunch"></a>
+    <a class="dot interactive" href="#science"></a>
+    <a class="dot interactive" href="#menu"></a>
+    <a class="dot interactive" href="#custom"></a>
+    <a class="dot interactive" href="#order"></a>
+  </div>
+
+  <section id="home" class="theme-section section-hero" data-theme="hero">
+    <div class="blob one"></div><div class="blob two"></div><div class="blob three"></div>
+    <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div class="reveal">
+        <p class="ingredient-pill inline-flex mb-6">Move your mouse • Tap the cookie</p>
+        <h1 class="font-display text-6xl md:text-8xl font-bold leading-[0.9] tracking-tight mb-6">
+          <span class="split-line"><span>Dubai</span></span>
+          <span class="split-line"><span>Chewy</span></span>
+          <span class="split-line"><span>Cookie.</span></span>
+        </h1>
+        <p class="text-lg md:text-xl max-w-xl leading-relaxed mb-8 opacity-80">A thick golden cookie packed with pistachio cream, crunchy kataifi, and molten chocolate. Soft centre. Crispy bite. Dangerous after one taste.</p>
+        <div class="flex flex-wrap gap-4">
+          <a href="https://buy.stripe.com/test_00waEQ6HUgIi3A7g5Wew802" class="btn-primary interactive">Buy the box →</a>
+          <a href="#science" class="btn-primary btn-light interactive">Explore inside</a>
+        </div>
+      </div>
+      <div class="cookie-stage reveal interactive" id="heroCookie">
+        <div class="ring"></div><div class="ring2"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="cookie-wrap"><div class="cookie"></div></div>
+      </div>
+    </div>
+    <div class="marquee"><span>PISTACHIO • KATAIFI • CHOCOLATE • CHEWY • </span></div>
+  </section>
+
+  <section id="crunch" class="theme-section section-crunch" data-theme="crunch">
+    <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div class="cookie-stage reveal order-2 lg:order-1 interactive" id="crunchCookie">
+        <div class="ring"></div><div class="ring2"></div>
+        <div class="cookie-wrap"><div class="cookie"></div></div>
+      </div>
+      <div class="reveal order-1 lg:order-2">
+        <p class="ingredient-pill inline-flex mb-6">Theme 01 — Click to crack</p>
+        <h2 class="font-display text-5xl md:text-7xl font-bold leading-none mb-6">Crispy shell. Soft chaos inside.</h2>
+        <p class="text-lg md:text-xl leading-relaxed max-w-xl opacity-80 mb-8">Click the cookie to make a crunch burst. Toasted kataifi gives that viral Dubai chocolate snap before the centre turns chewy and rich.</p>
+        <button id="crunchBtn" class="btn-primary btn-light interactive">Make it crunch ✦</button>
+      </div>
+    </div>
+    <div class="marquee"><span>CRUNCH • SNAP • MELT • REPEAT • </span></div>
+  </section>
+
+  <section id="science" class="theme-section section-pistachio" data-theme="science">
+    <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div class="reveal">
+        <p class="ingredient-pill inline-flex mb-6">Theme 02 — Interactive inside</p>
+        <h2 class="font-display text-5xl md:text-7xl font-bold leading-none mb-6">Tap the hotspots.</h2>
+        <p class="text-lg md:text-xl opacity-80 leading-relaxed mb-8">Each part of the cookie has a job: chew, crunch, cream, and chocolate balance.</p>
+        <div id="ingredientText" class="theme-card p-6 max-w-xl">
+          <p class="font-display text-3xl font-bold mb-2">Start exploring</p>
+          <p class="opacity-75">Click a numbered hotspot on the cookie to reveal what makes it work.</p>
+        </div>
+      </div>
+
+      <div class="cookie-stage reveal interactive">
+        <div class="ring"></div><div class="ring2"></div>
+        <div class="cookie-wrap"><div class="cookie"></div></div>
+        <button class="hotspot interactive" data-title="Pistachio cream" data-text="The green centre gives the cookie its rich Dubai chocolate flavour: nutty, creamy, and smooth.">1</button>
+        <button class="hotspot interactive" data-title="Kataifi crunch" data-text="Toasted pastry strands create a crisp snap so the cookie is not just soft and sweet.">2</button>
+        <button class="hotspot interactive" data-title="Chewy dough" data-text="A thick bakery-style dough keeps the middle soft while the outside stays golden.">3</button>
+        <div id="infoPop" class="info-pop"><p class="font-display text-2xl font-bold mb-1">Ingredient</p><p class="opacity-75">Info</p></div>
+      </div>
+    </div>
+    <div class="marquee"><span>THE SCIENCE OF CHEW • THE SCIENCE OF CRUNCH • </span></div>
+  </section>
+
+  <section id="menu" class="theme-section section-menu" data-theme="menu">
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="reveal max-w-3xl text-center mx-auto mb-10">
+        <p class="ingredient-pill inline-flex mb-6">Theme 03 — Pick your drop</p>
+        <h2 class="font-display text-5xl md:text-7xl font-bold leading-none mb-6">Choose your box.</h2>
+        <p class="text-lg md:text-xl opacity-80 leading-relaxed">Hover the cards. Click a flavour to feature it.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5 reveal">
+        <div class="flavour-card theme-card p-6 interactive active" data-flavour="Classic Dubai" data-desc="Pistachio cream, kataifi crunch, chocolate drizzle, chewy golden dough.">
+          <p class="text-6xl mb-6">🍪</p><h3 class="font-display text-3xl font-bold mb-2">Classic Dubai</h3><p class="opacity-75">The signature flavour.</p>
+        </div>
+        <div class="flavour-card theme-card p-6 interactive" data-flavour="Double Choc" data-desc="Extra cocoa dough, chocolate chunks, pistachio centre, and kataifi texture.">
+          <p class="text-6xl mb-6">🍫</p><h3 class="font-display text-3xl font-bold mb-2">Double Choc</h3><p class="opacity-75">For proper chocolate cravings.</p>
+        </div>
+        <div class="flavour-card theme-card p-6 interactive" data-flavour="Rose Pistachio" data-desc="A softer pastel version with pistachio cream and light rose sweetness.">
+          <p class="text-6xl mb-6">🌹</p><h3 class="font-display text-3xl font-bold mb-2">Rose Pistachio</h3><p class="opacity-75">Pretty, rich, and giftable.</p>
+        </div>
+      </div>
+      <div id="flavourOutput" class="theme-card mt-6 p-6 reveal max-w-3xl mx-auto text-center">
+        <p class="text-sm uppercase tracking-[0.25em] font-black opacity-60 mb-2">Selected flavour</p>
+        <h3 class="font-display text-4xl font-bold mb-2">Classic Dubai</h3>
+        <p class="opacity-75">Pistachio cream, kataifi crunch, chocolate drizzle, chewy golden dough.</p>
+      </div>
+      <div class="text-center mt-8 reveal">
+        <a href="https://buy.stripe.com/test_00waEQ6HUgIi3A7g5Wew802" class="btn-primary interactive">Checkout securely →</a>
+      </div>
+    </div>
+    <div class="marquee"><span>BOX DROP • UNI SNACK • LIMITED BATCH • </span></div>
+  </section>
+
+  <section id="custom" class="theme-section section-custom" data-theme="custom">
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="reveal max-w-3xl text-center mx-auto mb-10">
+        <p class="ingredient-pill inline-flex mb-6">Theme 04 — Build your box</p>
+        <h2 class="font-display text-5xl md:text-7xl font-bold leading-none mb-6">Customise an empty box.</h2>
+        <p class="text-lg md:text-xl opacity-80 leading-relaxed">Choose 1 cookie for $10, or fill all 4 slots for a discounted $35 box.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-stretch">
+        <div class="custom-box reveal interactive">
+          <div class="box-grid">
+            <div class="box-slot" data-slot="0"><p class="opacity-60 font-bold">Empty slot<br><span class="text-sm">Choose a flavour</span></p></div>
+            <div class="box-slot" data-slot="1"><p class="opacity-60 font-bold">Empty slot<br><span class="text-sm">Choose a flavour</span></p></div>
+            <div class="box-slot" data-slot="2"><p class="opacity-60 font-bold">Empty slot<br><span class="text-sm">Choose a flavour</span></p></div>
+            <div class="box-slot" data-slot="3"><p class="opacity-60 font-bold">Empty slot<br><span class="text-sm">Choose a flavour</span></p></div>
+          </div>
+        </div>
+
+        <div class="reveal flex flex-col gap-5">
+          <div class="theme-card p-6">
+            <p class="text-sm uppercase tracking-[0.25em] font-black opacity-60 mb-4">Pick flavours</p>
+            <div class="grid gap-3">
+              <button class="flavour-option interactive" data-box-flavour="Classic Dubai" data-colour="#2d8d53">🍪 Classic Dubai</button>
+              <button class="flavour-option interactive" data-box-flavour="Double Choc" data-colour="#5a2d1d">🍫 Double Choc</button>
+              <button class="flavour-option interactive" data-box-flavour="Rose Pistachio" data-colour="#ffc7d9">🌹 Rose Pistachio</button>
+              <button class="flavour-option interactive" data-box-flavour="White Choc Pistachio" data-colour="#f6dc91">🤍 White Choc Pistachio</button>
+            </div>
+          </div>
+
+          <div class="price-badge">
+            <p class="text-sm uppercase tracking-[0.25em] font-black opacity-70 mb-2">Your box</p>
+            <div class="flex items-end justify-between gap-4">
+              <div>
+                <h3 id="customCount" class="font-display text-4xl font-bold">0 cookies</h3>
+                <p id="customSummary" class="opacity-75">Start by picking a flavour.</p>
+              </div>
+              <p id="customPrice" class="text-5xl font-black">$0</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button id="resetBox" class="btn-primary btn-light interactive">Reset box</button>
+            <a href="https://buy.stripe.com/test_00waEQ6HUgIi3A7g5Wew802" class="btn-primary interactive">Checkout →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="marquee"><span>CUSTOM BOX • 1 FOR $10 • 4 FOR $35 • </span></div>
+  </section>
+
+  <section id="order" class="theme-section section-order" data-theme="order">
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="reveal max-w-4xl mx-auto text-center">
+        <p class="ingredient-pill inline-flex mb-6">Final Theme — The Craving</p>
+        <h2 class="font-display text-6xl md:text-8xl font-bold leading-[0.9] mb-8">Ready for the cookie everyone asks about?</h2>
+        <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-80 leading-relaxed mb-9">Small-batch Dubai chewy cookies made fresh, boxed beautifully, and ready for pickup or delivery near uni.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="https://buy.stripe.com/test_00waEQ6HUgIi3A7g5Wew802" class="btn-primary btn-light interactive">Order now →</a>
+          <button id="confettiBtn" class="btn-primary dark-card interactive">Make it rain crumbs</button>
+        </div>
+      </div>
+    </div>
+    <div class="marquee"><span>ORDER • BITE • MELT • REPEAT • </span></div>
+  </section>
+
+  <script>
+    const sections = [...document.querySelectorAll('.theme-section')];
+    const dots = [...document.querySelectorAll('.dot')];
+    const reveals = [...document.querySelectorAll('.reveal')];
+    const cursorDot = document.querySelector('.cursor-dot');
+    const cursorRing = document.querySelector('.cursor-ring');
+    let mouseX = innerWidth / 2, mouseY = innerHeight / 2;
+    let ringX = mouseX, ringY = mouseY;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      document.documentElement.style.setProperty('--x', `${(e.clientX / innerWidth) * 100}%`);
+      document.documentElement.style.setProperty('--y', `${(e.clientY / innerHeight) * 100}%`);
+      cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px';
+    });
+
+    function animateCursor() {
+      ringX += (mouseX - ringX) * 0.16;
+      ringY += (mouseY - ringY) * 0.16;
+      cursorRing.style.left = ringX + 'px'; cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    document.querySelectorAll('.interactive').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-big'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-big'));
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); });
+    }, { threshold: 0.18 });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = sections.indexOf(entry.target);
+          dots.forEach(dot => dot.classList.remove('active'));
+          if (dots[index]) dots[index].classList.add('active');
+        }
+      });
+    }, { threshold: 0.55 });
+    sections.forEach(section => sectionObserver.observe(section));
+
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      document.documentElement.style.setProperty('--scroll', scrolled);
+      document.querySelectorAll('.blob').forEach((blob, i) => {
+        blob.style.transform = `translateY(${scrolled * (0.03 + i * 0.015)}px)`;
+      });
+      document.querySelectorAll('.cookie-wrap').forEach((cookie, i) => {
+        const speed = i % 2 === 0 ? 0.04 : -0.03;
+        cookie.style.transform = `rotate(${scrolled * speed}deg)`;
+      });
+    });
+
+    document.querySelectorAll('.cookie-stage').forEach(stage => {
+      const wrap = stage.querySelector('.cookie-wrap');
+      if (!wrap) return;
+      stage.addEventListener('mousemove', e => {
+        const r = stage.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        wrap.style.transform = `rotateY(${x * 24}deg) rotateX(${-y * 24}deg) scale(1.03)`;
+      });
+      stage.addEventListener('mouseleave', () => wrap.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)');
+      stage.addEventListener('click', () => {
+        wrap.classList.add('shake');
+        setTimeout(() => wrap.classList.remove('shake'), 480);
+        crumbBurst(18);
+      });
+    });
+
+    function crumbBurst(count = 25) {
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'falling-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = ['#e0b65a','#b9d99e','#ffc7d9','#7b3f20'][Math.floor(Math.random()*4)];
+        piece.style.animationDuration = (1.5 + Math.random() * 2.2) + 's';
+        piece.style.transform = `rotate(${Math.random()*180}deg)`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 3800);
+      }
+    }
+
+    document.getElementById('crunchBtn').addEventListener('click', () => crumbBurst(35));
+    document.getElementById('confettiBtn').addEventListener('click', () => crumbBurst(60));
+
+    const ingredientText = document.getElementById('ingredientText');
+    const infoPop = document.getElementById('infoPop');
+    document.querySelectorAll('.hotspot').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const title = btn.dataset.title;
+        const text = btn.dataset.text;
+        ingredientText.innerHTML = `<p class="font-display text-3xl font-bold mb-2">${title}</p><p class="opacity-75">${text}</p>`;
+        infoPop.innerHTML = `<p class="font-display text-2xl font-bold mb-1">${title}</p><p class="opacity-75">${text}</p>`;
+        infoPop.classList.add('show');
+        crumbBurst(10);
+        setTimeout(() => infoPop.classList.remove('show'), 3200);
+      });
+    });
+
+    const flavourOutput = document.getElementById('flavourOutput');
+    document.querySelectorAll('.flavour-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.flavour-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        flavourOutput.innerHTML = `<p class="text-sm uppercase tracking-[0.25em] font-black opacity-60 mb-2">Selected flavour</p><h3 class="font-display text-4xl font-bold mb-2">${card.dataset.flavour}</h3><p class="opacity-75">${card.dataset.desc}</p>`;
+      });
+    });
+
+    const boxSlots = [...document.querySelectorAll('.box-slot')];
+    const customCount = document.getElementById('customCount');
+    const customSummary = document.getElementById('customSummary');
+    const customPrice = document.getElementById('customPrice');
+    const chosenCookies = [];
+
+    function updateCustomBox() {
+      boxSlots.forEach((slot, index) => {
+        const item = chosenCookies[index];
+        if (item) {
+          slot.classList.add('filled');
+          slot.innerHTML = `<div><div class="mini-cookie" style="--mini:${item.colour}"></div><p class="font-display text-xl font-bold leading-tight">${item.flavour}</p></div>`;
+        } else {
+          slot.classList.remove('filled');
+          slot.innerHTML = `<p class="opacity-60 font-bold">Empty slot<br><span class="text-sm">Choose a flavour</span></p>`;
+        }
+      });
+
+      const count = chosenCookies.length;
+      const price = count === 4 ? 35 : count * 10;
+      customCount.textContent = `${count} ${count === 1 ? 'cookie' : 'cookies'}`;
+      customPrice.textContent = `$${price}`;
+      customSummary.textContent = count === 0
+        ? 'Start by picking a flavour.'
+        : count === 4
+          ? 'Box complete — you unlocked the $35 box price.'
+          : `${4 - count} more slot${4 - count === 1 ? '' : 's'} to complete a box of 4.`;
+    }
+
+    document.querySelectorAll('.flavour-option').forEach(button => {
+      button.addEventListener('click', () => {
+        if (chosenCookies.length >= 4) {
+          crumbBurst(8);
+          return;
+        }
+        chosenCookies.push({ flavour: button.dataset.boxFlavour, colour: button.dataset.colour });
+        updateCustomBox();
+        crumbBurst(12);
+      });
+    });
+
+    boxSlots.forEach((slot, index) => {
+      slot.addEventListener('click', () => {
+        if (chosenCookies[index]) {
+          chosenCookies.splice(index, 1);
+          updateCustomBox();
+        }
+      });
+    });
+
+    document.getElementById('resetBox').addEventListener('click', () => {
+      chosenCookies.length = 0;
+      updateCustomBox();
+      crumbBurst(15);
+    });
+
+    updateCustomBox();
+
+    document.querySelectorAll('.tilt-card, .flavour-card, .theme-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        card.style.transform = `rotateY(${x * 9}deg) rotateX(${-y * 9}deg) translateY(-6px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        if (!card.classList.contains('active')) card.style.transform = '';
+      });
+    });
+  </script>
+</body>
+</html>
